@@ -2,3 +2,11 @@ name = "YMCMC"
 uuid = "3211b6a7-f93d-48dc-b30a-7a7b6690f121"
 authors = ["yiyuezhuo <yiyuezhuo@gmail.com>"]
 version = "0.1.0"
+
+[deps]
+DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
+Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
+DistributionsAD = "ced4e74d-a319-5a8a-b0ac-84af2272839c"
+ForwardDiff = "f6369f11-7733-5829-9624-2563aa707210"
+OffsetArrays = "6fe1bfb0-de20-5000-8ca7-80f57d26f881"
+StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"

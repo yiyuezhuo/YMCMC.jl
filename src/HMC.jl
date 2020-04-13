@@ -119,7 +119,7 @@ function HMC_DualAveraging(theta0, delta, lambda, likeli, M, M_adapt)
             theta_tilde, r_tilde = leapfrog(likeli, theta_tilde, r_tilde, eps_arr[m-1])
         end
         
-        accept = get_accept(likeli, theta_tilde, r_tilde, theta_arr[m-1], r0)
+        accept = get_accept(likeli, theta_tilde, r_tilde, theta_arr[m-1, :], r0)
         accept_arr[m-1] = accept
         
         if rand() < accept  # metropolis correction
