@@ -1,0 +1,4 @@
+name = "YMCMC"
+uuid = "3211b6a7-f93d-48dc-b30a-7a7b6690f121"
+authors = ["yiyuezhuo <yiyuezhuo@gmail.com>"]
+version = "0.1.0"
