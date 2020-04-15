@@ -22,7 +22,7 @@ function likeli(p)
     
     target = 0
     target += logpdf(Normal(0, 5), mu)
-    target += logpdf(Cauchy(0, 5), tau) + p[2]
+    target += logpdf(Cauchy(0, 5), tau) + p[2] # p[2] jacobian correction, so we posit prior on non-constrait parameter instead of tau
     target += logpdf.(Normal(0, 1), theta_tilde) |> sum
     target += logpdf.(Normal.(theta, schools_dat[:sigma]), schools_dat[:y]) |> sum
     
@@ -41,5 +41,16 @@ function recover_lp(mu, theta_t, tau)
     
     return target
 end
+
+reference_mean = [4.41, 3.51, 6.2, 4.81, 3.97, 4.76, 3.63, 4.08, 6.22, 4.82]
+
+function decode(posterior)
+    decoded = copy(posterior)
+    decoded[:, :, 2] = exp.(decoded[:, :, 2])
+    decoded[:, :, 3:end] = decoded[:, :, 3:end] .* decoded[:, :, 2] .+ decoded[:, :, 1]
+    return decoded
+end
+
+size_p = 10
 
 end

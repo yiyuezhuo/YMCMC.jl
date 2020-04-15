@@ -1,14 +1,24 @@
 """
-Arguments:
-    theta0: initial parameters value
-    eps: step size
-    L: iteration length
-    likeli: log lielihood function, Array{Float64, 1} -> Float64
-    M: sample size
-Return:
-    Array: draws x parameters
+    HMC(theta0, eps, L, likeli, M)
+
+# Arguments
+
+- `theta0`: initial parameters value
+- `eps`: step size
+- `L`: iteration length
+- `likeli`: log lielihood function, Array{Float64, 1} -> Float64
+- `M`: sample size
+
+Return: Array: draws x parameters
 """
-function HMC(theta0, eps, L, likeli, M)
+function HMC(
+        likeli::Function,
+        theta0::Vector{T},
+        M::Int;
+
+        eps::T, 
+        L::Int
+    ) where T <: Real
     n = size(theta0, 1)
     theta_arr = Array{Float64, 2}(undef, M+1, n)
     theta_arr = OffsetArray(theta_arr, 0:M, 1:n)
@@ -34,7 +44,7 @@ function HMC(theta0, eps, L, likeli, M)
     return Dict(:posterior => collect(theta_arr[1:end, :]))
 end
 
-function leapfrog(likeli, theta_tilde, r_tilde, eps)
+function leapfrog(likeli::Function, theta_tilde::Vector, r_tilde::Vector, eps::Real)
     r_tilde = r_tilde + (eps/2) * ForwardDiff.gradient(likeli, theta_tilde)
     theta_tilde = theta_tilde + eps * r_tilde
     r_tilde = r_tilde + (eps/2) * ForwardDiff.gradient(likeli, theta_tilde)
@@ -74,17 +84,28 @@ function FindReasonableEpsilon(likeli, theta)
 end
 
 """
-Arguments:
-    theta0: initial value
-    delta: target accept probability
-    lambda: "invariant" step length
-    likeli: sampled distribution (maybe up to a constant)
-    M: total sample size
-    M_adapt: warmup sample size
-Return:
-    theta_arr: Array, (draws, parameters)
+    HMC_DualAveraging(theta0, delta, lambda, likeli, M, M_adapt)
+
+# Arguments
+
+- `theta0`: initial value
+- `delta`: target accept probability
+- `lambda`: "invariant" step length
+- `likeli`: sampled distribution (maybe up to a constant)
+- `M`: total sample size
+- `M_adapt`: warmup sample size
+
+Return theta_arr: Array, (draws, parameters)
 """
-function HMC_DualAveraging(theta0, delta, lambda, likeli, M, M_adapt)
+function HMC_DualAveraging(
+        likeli::Function,
+        theta0::Vector{T},
+        M::Int;
+        
+        delta::T,
+        lambda::T,
+        M_adapt::Int
+    ) where T <: Real
     n = size(theta0, 1)
     
     gamma = 0.05

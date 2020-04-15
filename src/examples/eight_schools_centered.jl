@@ -29,4 +29,14 @@ function likeli(p)
     return target
 end
 
+reference_mean = [4.41, 3.51, 6.2, 4.81, 3.97, 4.76, 3.63, 4.08, 6.22, 4.82]
+
+function decode(posterior)
+    decoded = copy(posterior)
+    decoded[:, :, 2] = exp.(decoded[:, :, 2])
+    return decoded
+end
+
+size_p = 10
+
 end

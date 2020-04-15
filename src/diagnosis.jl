@@ -85,8 +85,8 @@ function mcmc_summary(posterior)
         n_eff = ess(post)
         Rhat = split_R_hat(post)
         _mean = mean(post)
-        se_mean = mean(post) / sqrt(n_eff)
         _sd = std(post)
+        se_mean = mean(_sd) / sqrt(n_eff)
         q_arr = quantile(vec(post), [0.025, 0.25, 0.5, 0.75, 0.9775])
         row = [_mean, se_mean, _sd, q_arr..., n_eff, Rhat]
         data_mat[pid, :] = row

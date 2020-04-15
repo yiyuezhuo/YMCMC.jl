@@ -1,50 +1,47 @@
 using Test
-import YMCMC: HMC, HMC_DualAveraging, mcmc_summary
-import YMCMC.examples: eight_schools_non_centered
+@time using YMCMC
+import YMCMC: HMC, HMC_DualAveraging, NUTS, NUTS_Naive, mcmc_summary
+import YMCMC: Examples
+
+function test_reference_mean(infer::Function, modu::Module; 
+        iter=2000, warmup=1000, chains=4, kwargs...)
+    iter_sampling = iter - warmup
+
+    size_p = getproperty(modu, :size_p)
+    likeli = getproperty(modu, :likeli)
+    decode = getproperty(modu, :decode)
+    reference_mean = getproperty(modu, :reference_mean)
+
+    posterior = Array{Float64, 3}(undef, chains, iter_sampling, size_p)
+    for chain in 1:chains
+        fit = infer(likeli, ones(size_p), iter; kwargs...)
+        posterior[chain, :, :] = fit[:posterior][end-iter_sampling+1:end, :]
+    end
+
+    decoded = decode(posterior)
+    df = mcmc_summary(decoded)
+    println(df)
+
+    converaged = all(abs.(df[!, :mean] .- reference_mean) .< (4*df[!, :se_mean]))
+    if !converaged
+        println("Converaged check failed:")
+        println([df[!, :mean]; reference_mean; df[!, :se_mean]])
+    end
+    return converaged
+end
+
+
 
 @testset "YMCMC" begin
     @testset "eight_schools_non_centered" begin
-        iter = 1000
-        chains = 4
-        warmup = iter ÷ 2
-        iter_sampling = iter - warmup
-        
-        posterior = Array{Float64, 3}(undef, chains, iter_sampling, 10)
-        for chain in 1:chains
-            fit = HMC(ones(10), 1e-1, 30, eight_schools_non_centered.likeli, iter) # (draws, parameters)
-            posterior[chain, :, :] = fit[:posterior][warmup+1:end, :]
-        end
+        # Test every inference method using non-centered eight schools model
+        @test @time test_reference_mean(HMC, Examples.eight_schools_non_centered; eps=1e-1, L=15)
+        @test @time test_reference_mean(HMC_DualAveraging, Examples.eight_schools_non_centered; delta=0.65, lambda=15., M_adapt=1000)
+        @test @time test_reference_mean(NUTS, Examples.eight_schools_non_centered; eps=1e-1)
+        @test @time test_reference_mean(NUTS_Naive, Examples.eight_schools_non_centered; eps=1e-1)
 
-        decoded = copy(posterior)
-        decoded[:, :, 2] = exp.(decoded[:, :, 2])
-        decoded[:, :, 3:end] = decoded[:, :, 3:end] .* decoded[:, :, 2] .+ decoded[:, :, 1]
-
-        df = mcmc_summary(decoded)
-        
-        reference_mean = [4.41, 3.51, 6.2, 4.81, 3.97, 4.76, 3.63, 4.08, 6.22, 4.82]
-        controlled = abs.(df[!, :mean] .- reference_mean) .< (5*df[!, :se_mean])
-        @test all(controlled)
-
-
-        iter = 1000
-        chains = 4
-        warmup = iter ÷ 2
-        iter_sampling = iter - warmup
-        
-        posterior = Array{Float64, 3}(undef, chains, iter_sampling, 10)
-        for chain in 1:chains
-            fit = HMC_DualAveraging(ones(10), 0.65, 15, eight_schools_non_centered.likeli, iter, warmup)
-            posterior[chain, :, :] = fit[:posterior][warmup+2:end, :]
-        end
-
-        decoded = copy(posterior)
-        decoded[:, :, 2] = exp.(decoded[:, :, 2])
-        decoded[:, :, 3:end] = decoded[:, :, 3:end] .* decoded[:, :, 2] .+ decoded[:, :, 1]
-        
-        df = mcmc_summary(decoded)
-
-        reference_mean = [4.41, 3.51, 6.2, 4.81, 3.97, 4.76, 3.63, 4.08, 6.22, 4.82]
-        controlled = abs.(df[!, :mean] .- reference_mean) .< (5*df[!, :se_mean])
-        @test all(controlled)
+        # test other example models
+        @test @time test_reference_mean(HMC, Examples.eight_schools_centered; eps=1e-1, L=15)
+        @test @time test_reference_mean(HMC, Examples.normal_sample; eps=1e-1, L=15)
     end
 end

@@ -11,7 +11,8 @@ using DataFrames
 import StatsBase: autocor
 
 include("HMC.jl")
+include("NUTS.jl")
 include("diagnosis.jl")
-include("examples/examples.jl")
+include("examples/Examples.jl")
 
 end # module
