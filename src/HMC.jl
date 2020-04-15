@@ -1,13 +1,19 @@
 """
-    HMC(theta0, eps, L, likeli, M)
+    HMC(
+        likeli::Function,
+        theta0::Vector{T},
+        M::Int;
 
-# Arguments
+        eps::T, 
+        L::Int
+        ) where T <: Real
+    # Arguments
 
-- `theta0`: initial parameters value
-- `eps`: step size
-- `L`: iteration length
 - `likeli`: log lielihood function, Array{Float64, 1} -> Float64
+- `theta0`: initial parameters value
 - `M`: sample size
+- `eps`: step size
+- `L`: integration iteration length
 
 Return: Array: draws x parameters
 """
@@ -84,15 +90,23 @@ function FindReasonableEpsilon(likeli, theta)
 end
 
 """
-    HMC_DualAveraging(theta0, delta, lambda, likeli, M, M_adapt)
+    HMC_DualAveraging(
+        likeli::Function,
+        theta0::Vector{T},
+        M::Int;
+        
+        delta::T,
+        lambda::T,
+        M_adapt::Int
+    ) where T <: Real
 
 # Arguments
 
+- `likeli`: sampled distribution (maybe up to a constant)
 - `theta0`: initial value
+- `M`: total sample size
 - `delta`: target accept probability
 - `lambda`: "invariant" step length
-- `likeli`: sampled distribution (maybe up to a constant)
-- `M`: total sample size
 - `M_adapt`: warmup sample size
 
 Return theta_arr: Array, (draws, parameters)

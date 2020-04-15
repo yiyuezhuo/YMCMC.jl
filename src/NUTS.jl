@@ -1,20 +1,23 @@
 """
     NUTS(
-        theta0::AbstractVector{<:Real}, 
-        eps::Real,
-        likeli::Function, 
-        M::Int,
-        delta_max::Real
-    )
+        likeli::Function,
+        theta0::Vector{T}, 
+        M::Int;
+        eps::T,
+
+        delta_max::T = 1000.,
+        max_tree_depth::Int = 15,
+    ) where T <: Real
 
 Naive_NUTS, see: The No-U-Turn Sampler: Adaptively Setting Path Lengths 
 in Hamiltonian Monte Carlo
 
 # Arguments
-- `theta0`: initial value
-- `eps`: step size
+
 - `likeli`: joint probability of model
+- `theta0`: initial value
 - `M`: size of draws
+- `eps`: step size
 - `delta_max`: 
 """
 function NUTS(
@@ -77,25 +80,27 @@ end
 
 """
     BuildTree(
-        theta::AbstractVector{<:Real}, 
-        r::AbstractVector{<:Real},
-        u::Real,
+        likeli::Function,
+
+        theta::Vector{T}, 
+        r::Vector{T},
+        log_u::T,
         v::Int, 
         j::Int,
-        eps::Real,
-        likeli::Function,
-        delta_max::Real
-    )
+        eps::T,
+
+        delta_max::T
+    ) where T <: Real
 
 # Arguments
 
+- `likeli`: joint probability up to a constant
 - `theta`: parameters
 - `r`: momentum
 - `u`: slice
 - `v`: direction
 - `j`: tree depth
 - `eps`: step size
-- `likeli`: joint probability up to a constant
 - `delta_max`: a threshold
 
 # Return
