@@ -14,9 +14,9 @@ function likeli(p)
     return target
 end
 
-reference_mean = [0., 1.]
+const reference_mean = [0., 1.]
 
 decode(x) = x
-size_p = 2
+const size_p = 2
 
 end
