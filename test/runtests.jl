@@ -1,6 +1,6 @@
 using Test
 @time using YMCMC
-import YMCMC: HMC, HMC_DualAveraging, NUTS, NUTS_Naive, mcmc_summary
+import YMCMC: HMC, HMC_DualAveraging, NUTS, NUTS_Naive, NUTS_DualAveraging, mcmc_summary
 import YMCMC: Examples
 
 function test_reference_mean(infer::Function, modu::Module; 
@@ -39,6 +39,7 @@ end
         @test @time test_reference_mean(HMC_DualAveraging, Examples.eight_schools_non_centered; delta=0.65, lambda=15., M_adapt=1000)
         @test @time test_reference_mean(NUTS, Examples.eight_schools_non_centered; eps=1e-1)
         @test @time test_reference_mean(NUTS_Naive, Examples.eight_schools_non_centered; eps=1e-1)
+        @test @time test_reference_mean(NUTS_DualAveraging, Examples.eight_schools_non_centered; delta=0.65, M_adapt=1000)
 
         # test other example models
         @test @time test_reference_mean(HMC, Examples.eight_schools_centered; eps=1e-1, L=15)

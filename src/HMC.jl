@@ -26,7 +26,7 @@ function HMC(
         L::Int
     ) where T <: Real
     n = size(theta0, 1)
-    theta_arr = Array{Float64, 2}(undef, M+1, n)
+    theta_arr = Array{T, 2}(undef, M+1, n)
     theta_arr = OffsetArray(theta_arr, 0:M, 1:n)
     theta_arr[0, :] = theta0
     for m = 1:M
@@ -126,19 +126,19 @@ function HMC_DualAveraging(
     t0 = 10
     kappa = 0.75
     
-    theta_arr = Array{Float64, 2}(undef, M+1, n)
+    theta_arr = Array{T, 2}(undef, M+1, n)
     theta_arr[1, :] = theta0
     
-    eps_arr = Array{Float64, 1}(undef, M+1)
+    eps_arr = Array{T, 1}(undef, M+1)
     eps_arr[1] = FindReasonableEpsilon(likeli, theta0)
     
-    eps_bar_arr = Array{Float64, 1}(undef, M_adapt+1)
+    eps_bar_arr = Array{T, 1}(undef, M_adapt+1)
     eps_bar_arr[1] = 1.0
     
-    H_arr = Array{Float64, 1}(undef, M_adapt+1)
+    H_arr = Array{T, 1}(undef, M_adapt+1)
     H_arr[1] = 0
     
-    accept_arr = Array{Float64, 1}(undef, M)
+    accept_arr = Array{T, 1}(undef, M)
     L_arr = Array{Int, 1}(undef, M)
     
     mu = log(10*eps_arr[1])
